@@ -328,6 +328,8 @@ extern "C" {
 				// Execute a blocking wait for that time in the future
 				errno = 0;
 				ret = px4_sem_timedwait(&sem, &ts);
+				//PX4_WARN("%s: px4_poll() sem error1 = %d errno= %d", thread_name, ret, errno);
+#if 0
 #ifndef __PX4_DARWIN
 				ret = errno;
 #endif
@@ -336,9 +338,10 @@ extern "C" {
 				if (ret > 0) {
 					ret = -ret;
 				}
+#endif
 
-				if (ret && ret != -ETIMEDOUT) {
-					PX4_WARN("%s: px4_poll() sem error", thread_name);
+				if (ret && errno != ETIMEDOUT) {
+					PX4_WARN("%s: px4_poll() sem error = %d errno = %d", thread_name, ret, errno);
 				}
 
 			} else if (timeout < 0) {

@@ -212,10 +212,17 @@ else()
 		-Dnoreturn_function=__attribute__\(\(noreturn\)\)
 		-include ${PX4_INCLUDE_DIR}visibility.h
                 )
+	execute_process(COMMAND xeno-config --cflags --posix
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE XENO_CFLAGS
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
 
 	# Use -pthread For linux/g++.
+	#	-pthread
+	#	xeno-config --cflags --ldflags --posix
 	set(added_cxx_flags
-		-pthread
+		${XENO_CFLAGS}
 		)
 
 endif()
@@ -255,11 +262,25 @@ elseif ("${BOARD}" STREQUAL "rpi" AND "$ENV{RPI_USE_CLANG}" STREQUAL "1")
 
 	set(added_c_flags ${POSIX_CMAKE_C_FLAGS} ${clang_added_flags})
 	list(APPEND added_cxx_flags ${POSIX_CMAKE_CXX_FLAGS} ${clang_added_flags})
-	list(APPEND added_exe_linker_flags ${POSIX_CMAKE_EXE_LINKER_FLAGS} ${clang_added_flags})
+	list(APPEND added_exe_linker_flags
+		${POSIX_CMAKE_EXE_LINKER_FLAGS} ${clang_added_flags}
+		)
 else()
 	# Add the toolchain specific flags
         set(added_cflags ${POSIX_CMAKE_C_FLAGS})
-	list(APPEND added_cxx_flags ${POSIX_CMAKE_CXX_FLAGS})
+	list(APPEND added_cxx_flags
+		${POSIX_CMAKE_CXX_FLAGS}
+		)
+	execute_process(COMMAND xeno-config --ldflags --posix
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE XENO_LDFLAGS
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
+	list(APPEND added_exe_linker_flags
+		${POSIX_CMAKE_EXE_LINKER_FLAGS}
+		${XENO_LDFLAGS}
+		)
+ 
 endif()
 
 	# output

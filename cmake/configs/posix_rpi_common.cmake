@@ -17,12 +17,12 @@ set(config_module_list
 	#
 	drivers/device
 	modules/sensors
-	platforms/posix/drivers/df_mpu9250_wrapper
+	#platforms/posix/drivers/df_mpu9250_wrapper
 	platforms/posix/drivers/df_lsm9ds1_wrapper
-	platforms/posix/drivers/df_ms5611_wrapper
-	platforms/posix/drivers/df_hmc5883_wrapper
-	platforms/posix/drivers/df_trone_wrapper
-	platforms/posix/drivers/df_isl29501_wrapper
+	#platforms/posix/drivers/df_ms5611_wrapper
+	#platforms/posix/drivers/df_hmc5883_wrapper
+	#platforms/posix/drivers/df_trone_wrapper
+	#platforms/posix/drivers/df_isl29501_wrapper
 
 	#
 	# System commands
@@ -71,10 +71,10 @@ set(config_module_list
 	# PX4 drivers
 	#
 	drivers/gps
-	drivers/navio_sysfs_rc_in
-	drivers/navio_sysfs_pwm_out
-	drivers/navio_gpio
-	drivers/navio_rgbled
+	#drivers/navio_sysfs_rc_in
+	#drivers/navio_sysfs_pwm_out
+	#drivers/navio_gpio
+	#drivers/navio_rgbled
 
 	#
 	# Libraries
@@ -105,10 +105,10 @@ set(config_module_list
 # DriverFramework driver
 #
 set(config_df_driver_list
-	mpu9250
+	#mpu9250
 	lsm9ds1
-	ms5611
-	hmc5883
-	trone
-	isl29501
+	#ms5611
+	#hmc5883
+	#trone
+	#isl29501
 )

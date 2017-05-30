@@ -286,6 +286,58 @@ static void set_cpu_scaling()
 #endif
 }
 
+#if 1
+static const char *sigdebug_reasons[] = {
+	[SIGDEBUG_UNDEFINED] = "latency: received SIGXCPU for unknown reason",
+	[SIGDEBUG_MIGRATE_SIGNAL] = "received signal",
+	[SIGDEBUG_MIGRATE_SYSCALL] = "invoked syscall",
+	[SIGDEBUG_MIGRATE_FAULT] = "triggered fault",
+	[SIGDEBUG_MIGRATE_PRIOINV] = "affected by priority inversion",
+	[SIGDEBUG_NOMLOCK] = "Xenomai: process memory not locked "
+	"(missing mlockall?)",
+	[SIGDEBUG_WATCHDOG] = "Xenomai: watchdog triggered "
+	"(period too short?)",
+};
+
+void sigdebug_handler(int sig, siginfo_t *si, void *context);
+void sigdebug_handler(int sig, siginfo_t *si, void *context)
+{
+	const char fmt[] = "Mode switch (reason: %s), aborting. Backtrace:\n";
+	unsigned int reason = si->si_int;//sigdebug_reason[si];
+	static char buffer[256];
+	//static void *bt[200];
+	unsigned int n;
+
+	if (reason > SIGDEBUG_WATCHDOG)
+		reason = SIGDEBUG_UNDEFINED;
+
+	switch(reason) {
+	case SIGDEBUG_UNDEFINED:
+	case SIGDEBUG_NOMLOCK:
+	case SIGDEBUG_WATCHDOG:
+		/* These errors are lethal, something went really wrong. */
+		n = snprintf(buffer, sizeof(buffer),
+			     "%s\n", sigdebug_reasons[reason]);
+		if (write(STDERR_FILENO, buffer, n) < 0) {
+		perror("write");
+		}
+		exit(EXIT_FAILURE);
+	}
+
+	/* Retrieve the current backtrace, and decode it to stdout. */
+	n = snprintf(buffer, sizeof(buffer), fmt, sigdebug_reasons[reason]);
+	n = write(STDERR_FILENO, buffer, n);
+	/*
+	n = backtrace(bt, sizeof(bt)/sizeof(bt[0]));
+	backtrace_symbols_fd(bt, n, STDERR_FILENO);
+	*/
+
+	signal(sig, SIG_DFL);
+	kill(getpid(), sig);
+}
+#endif
+
+
 int main(int argc, char **argv)
 {
 	bool daemon_mode = false;
@@ -307,6 +359,14 @@ int main(int argc, char **argv)
 	sigaction(SIGINT, &sig_int, NULL);
 	//sigaction(SIGTERM, &sig_int, NULL);
 	sigaction(SIGFPE, &sig_fpe, NULL);
+
+#if 1
+	struct sigaction sa;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = sigdebug_handler;
+	sa.sa_flags = SA_SIGINFO;
+	sigaction(SIGDEBUG, &sa, NULL);
+#endif
 
 	set_cpu_scaling();
 

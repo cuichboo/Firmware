@@ -86,7 +86,7 @@ all: posix_sitl_default
 # by cmake in the subdirectory
 FIRST_ARG := $(firstword $(MAKECMDGOALS))
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-j ?= 4
+j ?= 8
 
 ifndef NO_NINJA_BUILD
 NINJA_BUILD := $(shell ninja --version 2>/dev/null)
