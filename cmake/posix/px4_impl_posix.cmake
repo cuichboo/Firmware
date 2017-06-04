@@ -206,9 +206,11 @@ if(UNIX AND APPLE)
 else()
 
         set(added_definitions
+		-g
+		-funwind-tables
 		-D__PX4_POSIX
 		-D__PX4_LINUX
-		-D__DF_LINUX
+		-D__DF_XENO
 		-Dnoreturn_function=__attribute__\(\(noreturn\)\)
 		-include ${PX4_INCLUDE_DIR}visibility.h
                 )
@@ -279,6 +281,7 @@ else()
 	list(APPEND added_exe_linker_flags
 		${POSIX_CMAKE_EXE_LINKER_FLAGS}
 		${XENO_LDFLAGS}
+		-funwind-tables
 		)
  
 endif()
